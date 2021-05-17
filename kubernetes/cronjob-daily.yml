@@ -1,0 +1,38 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: postgresql-backup-s3-daily
+spec:
+  schedule: "0 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: postgresql-backup-s3
+              image: sverrirab/postgresql-backup-s3
+              env:
+                - name: PGHOST
+                  value: REPLACE-WITH-YOUR-DATABASE-HOSTNAME
+                - name: DEST_S3_BUCKET
+                  value: REPLACE-WITH-YOUR-S3-BUCKET_NAME
+                - name: DEST_S3_FOLDER
+                  value: daily
+                - name: PGUSER
+                  value: postgres
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgresql-backup-s3
+                      key: pgpassword
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgresql-backup-s3
+                      key: aws_access_key_id
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgresql-backup-s3
+                      key: aws_secret_access_key
