@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-backup-s3-config
+data:
+  PGHOST: REPLACE-WITH-YOUR-DATABASE-HOSTNAME
+  DEST_S3_BUCKET: REPLACE-WITH-YOUR-S3-BUCKET-NAME

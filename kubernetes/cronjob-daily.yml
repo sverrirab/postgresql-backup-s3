@@ -1,9 +1,11 @@
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: postgresql-backup-s3-daily
 spec:
+  concurrencyPolicy: Forbid
   schedule: "0 3 * * *"
+  successfulJobsHistoryLimit: 14
   jobTemplate:
     spec:
       template:
@@ -13,10 +15,6 @@ spec:
             - name: postgresql-backup-s3
               image: sverrirab/postgresql-backup-s3
               env:
-                - name: PGHOST
-                  value: REPLACE-WITH-YOUR-DATABASE-HOSTNAME
-                - name: DEST_S3_BUCKET
-                  value: REPLACE-WITH-YOUR-S3-BUCKET_NAME
                 - name: DEST_S3_FOLDER
                   value: daily
                 - name: PGUSER
@@ -36,3 +34,8 @@ spec:
                     secretKeyRef:
                       name: postgresql-backup-s3
                       key: aws_secret_access_key
+              envFrom:
+                - configMapRef:
+                    # You can override the values above in the config map
+                    # Note: there are required parameters in the map you need to edit
+                    name: postgresql-backup-s3-config

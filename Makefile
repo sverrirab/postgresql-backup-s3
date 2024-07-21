@@ -2,10 +2,15 @@ name := postgresql-backup-s3
 version := $(shell cat VERSION)
 image := sverrirab/$(name)
 
+.PHONY: all build run tag push echo
+
 all: echo build push
 
 build:
-	docker build -t $(name) ./docker
+	docker build --platform linux/amd64 -t $(name) ./docker
+
+run: build
+	docker run --platform linux/amd64 --rm -it --entrypoint /bin/bash $(name)
 
 tag:
 	docker tag $(name) $(image):$(version)
